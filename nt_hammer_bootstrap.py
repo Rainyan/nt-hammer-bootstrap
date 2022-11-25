@@ -13,7 +13,7 @@ import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
 
-DEBUG = True
+DEBUG = False
 
 STEAM_APPIDS = {
     "Neotokyo": 244630,
@@ -22,7 +22,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 
 def resource_path():

@@ -11,7 +11,9 @@ An interactive GUI helper for setting up Source SDK and Hammer editor, for mappi
 
 This tool automates the entire mapping tools setup described in [this Steam guide](https://steamcommunity.com/sharedfiles/filedetails/?id=282059949).
 
-![Example of the app GUI window](https://user-images.githubusercontent.com/6595066/203887912-53c742fa-2fa0-4e78-b34c-e035bb8d95dd.png)
+<kbd><!-- This tag adds a border, so that the bright example image renders nicely for not-darkmode users. -->
+  <img alt="Example of the app GUI window" src="https://user-images.githubusercontent.com/6595066/203887912-53c742fa-2fa0-4e78-b34c-e035bb8d95dd.png" />
+</kbd>
 
 ## Requirements
 

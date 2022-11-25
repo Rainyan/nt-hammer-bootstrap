@@ -4,7 +4,9 @@ An interactive GUI helper for setting up Source SDK and Hammer editor, for mappi
 
 ## Requirements
 
-* Windows 10 or newer (older versions may work, but aren't officially supported)
+* Windows 10 or newer
+  * Older Windows versions may work, but aren't officially supported
+  * For Linux, you may be able to run this in the same Wine prefix as your Windows tooling, but this remains untested as of now
 * Steam has to be installed, and logged in
 
 ## Installation

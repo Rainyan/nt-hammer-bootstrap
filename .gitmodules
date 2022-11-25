@@ -1,0 +1,3 @@
+[submodule "valve-keyvalues-python"]
+	path = valve_keyvalues_python
+	url = https://github.com/gorgitko/valve-keyvalues-python

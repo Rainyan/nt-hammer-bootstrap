@@ -67,7 +67,7 @@ def generate_hammer_config():
     neotokyo_base_path = os.path.join(get_app_install_path(STEAM_APPIDS["Neotokyo"]), "NEOTOKYO")
     if not os.path.isdir(neotokyo_base_path):
         oneshot_window("Abort", "Could not find NEOTOKYO Steam installation.")
-        exit(1)
+        sys.exit(1)
     # assert os.path.isdir(neotokyo_base_path), "Could not find NEOTOKYO Steam installation."
     mapping_path = os.path.join(neotokyo_base_path, "mapping")
     try:

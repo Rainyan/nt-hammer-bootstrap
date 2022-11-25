@@ -49,3 +49,8 @@ pipenv run python nt_hammer_bootstrap.py  # Run app
 
 Please see the [.github/workflows](.github/workflows) files for code on building the .exe binary.
 
+### Acknowledgements
+
+This project uses the following open-source software:
+* [valve-keyvalues-python](https://github.com/gorgitko/valve-keyvalues-python)
+* [PySimpleGUI](https://github.com/PySimpleGUI/PySimpleGUI)

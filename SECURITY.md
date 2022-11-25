@@ -8,7 +8,7 @@
 | <latest | :x:                |
 
 Only [the latest (non pre-release) release tag](https://github.com/Rainyan/nt-hammer-bootstrap/releases/latest) is supported at any time.
-Support includes both the binary release, and its Python source code version.
+Support includes both the binary .exe release, and its Python source code version.
 
 Only Windows 10 or newer is supported.
 

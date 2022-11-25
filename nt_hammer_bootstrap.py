@@ -39,7 +39,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 
 def resource_path():

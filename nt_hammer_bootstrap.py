@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 
+"""An interactive GUI helper for setting up Source SDK and Hammer editor for NT mapping.
+
+   Copyright (C) 2022 github.com/Rainyan
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 import os
 assert os.name == "nt", "This script supports Windows only."
 import sys
 
-from collections import OrderedDict
 import webbrowser
 import winreg
-from time import sleep
 
 import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
@@ -21,21 +37,23 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.1.2"
+VERSION = "0.2.0"
 
 
 def resource_path():
+    """Returns the resource path."""
     try:
-        base_path = sys._MEIPASS
-    except Exception:
+        base_path = sys._MEIPASS  # pylint: disable=protected-access
+    except AttributeError:
         base_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.normpath(base_path)
 
 
 def get_steam_install_path():
+    """Returns the path where Steam is installed."""
     keys = (
-        "SOFTWARE\Wow6432Node\Valve\Steam",  # x64
-        "SOFTWARE\Valve\Steam",  # x86
+        "SOFTWARE\\Wow6432Node\\Valve\\Steam",  # x64
+        "SOFTWARE\\Valve\\Steam",  # x86
     )
     registry = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
     for key in keys:
@@ -50,18 +68,21 @@ def get_steam_install_path():
 
 
 def get_app_install_path(appid):
+    """Return the path where a Steam AppID is installed, or "" if not found."""
     libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
     assert os.path.exists(libfolders)
-    kv = KeyValues(filename=libfolders)
+    kv = KeyValues(filename=libfolders)  # pylint: disable=invalid-name
     for k in kv["libraryfolders"]:
         if not str(appid) in kv["libraryfolders"][k]["apps"]:
             continue
-        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"], "steamapps", "common"))
-        break
+        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"],
+                                             "steamapps",
+                                             "common"))
     return ""
 
 
 def generate_hammer_config():
+    """Generates the GameInfo.txt and GameConfig.txt configs for NT Hammer."""
     neotokyo_base_path = os.path.join(get_app_install_path(STEAM_APPIDS["Neotokyo"]), "NEOTOKYO")
     if not os.path.isdir(neotokyo_base_path):
         oneshot_window("Abort", "Could not find NEOTOKYO Steam installation.")
@@ -69,14 +90,15 @@ def generate_hammer_config():
     mapping_path = os.path.join(neotokyo_base_path, "mapping")
     try:
         os.mkdir(mapping_path)
-    except FileExistsError as err:
-        if DEBUG:
-            pass
-        else:
-            oneshot_window("Continue", "Mapping path already exists! Are you sure you want to continue?\nIf not, abort with the top-right X button.")
-            pass
-    with open(os.path.join(resource_path(), "payload", "GameInfo.txt"), mode="r", encoding="utf-8") as f_read:
-        with open(os.path.join(mapping_path, "GameInfo.txt"), mode="w", encoding="utf-8") as f_write:
+    except FileExistsError:
+        oneshot_window("Continue", "Mapping path already exists! "
+                                   "Are you sure you want to continue?\n"
+                                   "If not, abort with the top-right X button.")
+
+    with open(os.path.join(resource_path(), "payload", "GameInfo.txt"),
+              mode="r", encoding="utf-8") as f_read:
+        with open(os.path.join(mapping_path, "GameInfo.txt"),
+                  mode="w", encoding="utf-8") as f_write:
             f_write.write(f_read.read())
 
     source_sdk_base_path = os.path.join(get_app_install_path(STEAM_APPIDS["Source SDK"]))
@@ -96,7 +118,8 @@ def generate_hammer_config():
     if os.path.exists(gameconfig_path):
         oneshot_window("Continue",
                        f'GameConfig path already exists ({gameconfig_path}).'
-                       "\nAre you sure you want to continue? If not, abort with the top-right X button.")
+                       "\nAre you sure you want to continue? "
+                       "If not, abort with the top-right X button.")
 
     with open(payload_gameconfig, mode="r", encoding="utf-8") as f_read:
         data = f_read.read()
@@ -114,11 +137,17 @@ def generate_hammer_config():
 
 
 def install_steamapp(app):
+    """Initiates a Steam install of an app.
+
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Installing app {app}...")
     webbrowser.open(f"steam://install/{STEAM_APPIDS[app]}")
 
 
 def launch_steamapp(app):
+    """Launches a Steam app.
+
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
 
@@ -126,6 +155,7 @@ def launch_steamapp(app):
 def oneshot_window(text_button="",
                    text_label="Please follow the instructions, and press the button when ready.",
                    title=f"Hammer install helper (v{VERSION})"):
+    """Create a blocking one-and-done GUI window."""
     label = sg.Text(text_label)
     button = sg.Button(text_button)
     layout = [[label], [button]]
@@ -137,29 +167,49 @@ def oneshot_window(text_button="",
 
 
 def instruct_app_installation(app_name):
-    oneshot_window("Ready to begin", f"Steam will now install {app_name}.\nIf it was already installed, nothing will happen, and you can continue as-is.\nOtherwise, please complete the Steam install procedure before continuing.")
+    """Specialized version of oneshot_window() for Steam app installation.
+
+       Input: App name which has a STEAM_APPIDS value defined."""
+    oneshot_window("Ready to begin",
+                   f"Steam will now install {app_name}.\nIf it was already installed, "
+                   "nothing will happen, and you can continue as-is.\nOtherwise, please "
+                   "complete the Steam install procedure before continuing.")
     install_steamapp(app_name)
-    oneshot_window(f"Press when {app_name} has been fully installed in Steam.", f"Now installing {app_name}. If it was already installed, nothing will happen, and you can continue as-is.")
+    oneshot_window(f"Press when {app_name} has been fully installed in Steam.",
+                   f"Now installing {app_name}. If it was already installed, "
+                   "nothing will happen, and you can continue as-is.")
     oneshot_window(f"Press here to launch {app_name}",
-                   f"Please launch {app_name}, and then close it. This step generates some required files.")
+                   f"Please launch {app_name}, and then close it. "
+                   "This step generates some required files.")
     launch_steamapp(app_name)
-    oneshot_window(f"Please close {app_name}, and then press this button when you're ready to continue.", f"{app_name} setup completed.")
+    oneshot_window(f"Please close {app_name}, and then press this button when you're "
+                   "ready to continue.", f"{app_name} setup completed.")
 
 
-oneshot_window("Next", "This is an interactive helper tool for setting up Hammer, for mapping for Neotokyo.")
-oneshot_window("Next", "Please read the instruction texts carefully before clicking next!\nSome of them will require you to perform actions before continuing.")
-oneshot_window("Next", "If you wish to cancel the installation at any time, press the X button in the top-right corner of these popup windows.")
-oneshot_window("Ready to continue", "Please open Steam and log in before continuing.")
+oneshot_window("Next",
+               "This is an interactive helper tool for setting up Hammer, "
+               "for mapping for Neotokyo.")
+oneshot_window("Next",
+               "Please read the instruction texts carefully before clicking next!\n"
+               "Some of them will require you to perform actions before continuing.")
+oneshot_window("Next",
+               "If you wish to cancel the installation at any time, press the X button "
+               "in the top-right corner of these popup windows.")
+oneshot_window("Ready to continue",
+               "Please open Steam and log in before continuing.")
 
-for app_name in STEAM_APPIDS:
-    instruct_app_installation(app_name)
+for steamapp in STEAM_APPIDS:
+    instruct_app_installation(steamapp)
 
-    oneshot_window("Ready to continue", "All Steam requirements are now installed.")
-oneshot_window("Ready to generate Hammer configs", "Next, the tool will generate the required GameInfo/GameConfig configs.\nPlease back these up if you need to; we will overwrite them otherwise.")
+oneshot_window("Ready to continue",
+               "All Steam requirements are now installed.")
+oneshot_window("Ready to generate Hammer configs",
+               "Next, the tool will generate the required GameInfo/GameConfig configs.\n"
+               "Please back these up if you need to; we will overwrite them otherwise.")
 generate_hammer_config()
 oneshot_window("Finish",
-               "All done! To launch Hammer, please open Source SDK from Steam library's Tools section.\n"
-               'In the "Engine version" section, select "Source SDK 2006".\n'
+               "All done! To launch Hammer, please open Source SDK from Steam library's "
+               'Tools section.\nIn the "Engine version" section, select "Source SDK 2006".\n'
                'In the "Current Game" section, select "NEOTOKYO".\n\n'
                'If you ran into any bugs/issues when using this tool, please report them at:\n'
                f'{TOOL_HOMEPAGE}')

@@ -2,6 +2,8 @@
 
 An interactive GUI helper for setting up Source SDK and Hammer editor, for mapping for Neotokyo.
 
+![Example of the app GUI window](https://user-images.githubusercontent.com/6595066/203887912-53c742fa-2fa0-4e78-b34c-e035bb8d95dd.png)
+
 ## Requirements
 
 * Windows 10 or newer

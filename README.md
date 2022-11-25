@@ -24,7 +24,9 @@ Please see the LICENSE file for details. This project and its derivatives must u
 ### Setting up the environment
 
 ```bash
-git clone https://github.com/Rainyan/nt-hammer-bootstrap  # Or use your fork, instead
+# Or use your fork, instead.
+# Note that we have submodules that also need to be cloned here.
+git clone --recurse-submodules https://github.com/Rainyan/nt-hammer-bootstrap
 cd "./nt-hammer-bootstrap"
 pip install --upgrade pipenv  # For virtualizing the dev environment
 pipenv --three

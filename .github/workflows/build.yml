@@ -34,6 +34,13 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: pyinstaller --onefile --version-file version.rc --add-data "payload/GameConfig.txt;payload" --add-data "payload/GameInfo.txt;payload" --paths valve_keyvalues_python nt_hammer_bootstrap.py
 
+      - name: Copy other requirements
+        working-directory: ${{ github.workspace }}
+        shell: powershell
+        run: |
+          Copy-Item "LICENSE" -Destination ".\dist"
+          Copy-Item "README.md" -Destination ".\dist"
+
       - name: Create build compressed archive
         working-directory: ${{ github.workspace }}
         shell: powershell

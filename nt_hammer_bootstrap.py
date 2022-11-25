@@ -13,8 +13,6 @@ import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
 
-DEBUG = False
-
 # This needs to be in the install order.
 STEAM_APPIDS = {
     "Neotokyo": 244630,
@@ -55,7 +53,6 @@ def get_app_install_path(appid):
     libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
     assert os.path.exists(libfolders)
     kv = KeyValues(filename=libfolders)
-    d = OrderedDict()
     for k in kv["libraryfolders"]:
         if not str(appid) in kv["libraryfolders"][k]["apps"]:
             continue
@@ -69,7 +66,6 @@ def generate_hammer_config():
     if not os.path.isdir(neotokyo_base_path):
         oneshot_window("Abort", "Could not find NEOTOKYO Steam installation.")
         sys.exit(1)
-    # assert os.path.isdir(neotokyo_base_path), "Could not find NEOTOKYO Steam installation."
     mapping_path = os.path.join(neotokyo_base_path, "mapping")
     try:
         os.mkdir(mapping_path)
@@ -77,10 +73,8 @@ def generate_hammer_config():
         if DEBUG:
             pass
         else:
-            oneshot_window("Continue", "Mapping path already exists! Are you sure you want to continue? If not, abort with the top-right X button.")
+            oneshot_window("Continue", "Mapping path already exists! Are you sure you want to continue?\nIf not, abort with the top-right X button.")
             pass
-            # err.add_note("You should only use this script for a clean Hammer environment setup.")
-            # raise err
     with open(os.path.join(resource_path(), "payload", "GameInfo.txt"), mode="r", encoding="utf-8") as f_read:
         with open(os.path.join(mapping_path, "GameInfo.txt"), mode="w", encoding="utf-8") as f_write:
             f_write.write(f_read.read())
@@ -90,28 +84,20 @@ def generate_hammer_config():
     sdk_content_path = os.path.join(source_sdk_base_path, "sourcesdk_content")
 
     if not os.path.isdir(neotokyo_base_path):
-        oneshot_window("Abort", "Could not find Source SDK installation. "
+        oneshot_window("Abort", "Could not find Source SDK installation.\n"
                                 "Make sure you have both Source SDK and "
-                                "Source SDK Base 2006 installed, and launch "
+                                "Source SDK Base 2006 installed,\nand launch "
                                 "and quit Source SDK from Steam library tools "
                                 "at least once.")
         sys.exit(1)
-    # assert os.path.isdir(neotokyo_base_path), ("Could not find Source SDK installation. "
-    #                                             "Make sure you have both Source SDK and "
-    #                                             "Source SDK Base 2006 installed, and launch "
-    #                                             "and quit Source SDK from Steam library tools "
-    #                                             "at least once.")
 
     payload_gameconfig = os.path.join(resource_path(), "payload", "GameConfig.txt")
     gameconfig_path = os.path.join(sdk_path, "GameConfig.txt")
     if os.path.exists(gameconfig_path):
-        oneshot_window("Continue", f'GameConfig path already exists ({gameconfig_path}). Are you sure you want to continue? If not, abort with the top-right X button.')
-        # response = input(f'GameConfig path already exists ({gameconfig_path}). If you want to overwrite it, please type "yes": ')
-        # if response.lower() != "yes":
-        #     print('Response was not "yes"; exiting.')
-        #     sys.exit(1)
-        # else:
-        #     print(f"Overwriting: {gameconfig_path}")
+        oneshot_window("Continue",
+                       f'GameConfig path already exists ({gameconfig_path}).'
+                       "\nAre you sure you want to continue? If not, abort with the top-right X button.")
+
     with open(payload_gameconfig, mode="r", encoding="utf-8") as f_read:
         data = f_read.read()
         data = data.replace("$NTBASE", neotokyo_base_path)
@@ -177,20 +163,3 @@ oneshot_window("Finish",
                'In the "Current Game" section, select "NEOTOKYO".\n\n'
                'If you ran into any bugs/issues when using this tool, please report them at:\n'
                f'{TOOL_HOMEPAGE}')
-sys.exit(0)
-
-
-# if not DEBUG:
-#     input("Please launch Steam if it's not already running. Press the Enter key to continue setup.")
-#     print("\n## APPS INSTALLATION ##")
-#     install_steamapp("Neotokyo")
-#     install_steamapp("Source SDK")
-#     install_steamapp("Source SDK Base 2006")
-#     print("\n## APPS PREREQUISITES ##")
-#     launch_steamapp("Neotokyo")
-#     launch_steamapp("Source SDK")
-# print("\n## GENERATING CONFIGURATION ##")
-# generate_hammer_config()
-# print('\nAll done! To launch Hammer, please open Source SDK from Steam library\'s Tools section. '
-#       'In the "Engine version" section, select "Source SDK 2006". In the "Current Game" section, select "NEOTOKYO".')
-# input("\nPress Enter to exit this setup.")

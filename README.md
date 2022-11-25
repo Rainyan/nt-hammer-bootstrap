@@ -15,13 +15,18 @@ An interactive GUI helper for setting up Source SDK and Hammer editor, for mappi
 
 * The entire process is automated, just read the instructions and click the buttons.
 
-## For developers
+## Contributing
 
-### Licensing
+### Bug reports
+If you have questions or run into problems, [bug reports](https://github.com/Rainyan/nt-hammer-bootstrap/issues) are welcome!
 
-Please see the LICENSE file for details. This project and its derivatives must use GPL, because our GUI library dependency is GPL.
+### For developers
 
-### Setting up the environment
+#### Project licensing
+
+Please see the [LICENSE](LICENSE) file for details. This project and its derivatives must use GPL, because our GUI library dependency is GPL.
+
+#### Setting up the environment
 
 ```bash
 # Or use your fork, instead.
@@ -34,7 +39,7 @@ pipenv run pip install --upgrade -r requirements.txt
 pipenv run python nt_hammer_bootstrap.py  # Run app
 ```
 
-### Building the executable
+#### Building the executable
 
-Please see the `.github/workflows` files for code on building the .exe binary.
+Please see the [.github/workflows](.github/workflows) files for code on building the .exe binary.
 

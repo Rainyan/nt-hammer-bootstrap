@@ -1,3 +1,9 @@
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/Rainyan/nt-hammer-bootstrap?include_prereleases)](https://github.com/Rainyan/nt-hammer-bootstrap/releases/latest)
+[![License: GPLv3](https://img.shields.io/github/license/Rainyan/nt-hammer-bootstrap)](LICENSE)
+[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
+[![Pylint](https://github.com/Rainyan/nt-hammer-bootstrap/actions/workflows/pylint.yml/badge.svg)](https://github.com/Rainyan/nt-hammer-bootstrap/actions/workflows/pylint.yml)
+[![CodeQL](https://github.com/Rainyan/nt-hammer-bootstrap/actions/workflows/codeql.yml/badge.svg)](https://github.com/Rainyan/nt-hammer-bootstrap/actions/workflows/codeql.yml)
+
 # nt-hammer-bootstrap
 
 An interactive GUI helper for setting up Source SDK and Hammer editor, for mapping for Neotokyo.

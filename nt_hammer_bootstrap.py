@@ -15,6 +15,7 @@ from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
 DEBUG = False
 
+# This needs to be in the install order.
 STEAM_APPIDS = {
     "Neotokyo": 244630,
     "Source SDK": 211,
@@ -163,10 +164,11 @@ oneshot_window("Next", "This is an interactive helper tool for setting up Hammer
 oneshot_window("Next", "Please read the instruction texts carefully before clicking next!\nSome of them will require you to perform actions before continuing.")
 oneshot_window("Next", "If you wish to cancel the installation at any time, press the X button in the top-right corner of these popup windows.")
 oneshot_window("Ready to continue", "Please open Steam and log in before continuing.")
-instruct_app_installation("Neotokyo")
-instruct_app_installation("Source SDK")
-instruct_app_installation("Source SDK Base 2006")
-oneshot_window("Ready to continue", "All Steam requirements are now installed.")
+
+for app_name in STEAM_APPIDS:
+    instruct_app_installation(app_name)
+
+    oneshot_window("Ready to continue", "All Steam requirements are now installed.")
 oneshot_window("Ready to generate Hammer configs", "Next, the tool will generate the required GameInfo/GameConfig configs.\nPlease back these up if you need to; we will overwrite them otherwise.")
 generate_hammer_config()
 oneshot_window("Finish",

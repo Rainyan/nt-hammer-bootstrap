@@ -1,3 +1,4 @@
+[![Supported platforms](https://img.shields.io/badge/platform-Windows-lightgrey)](https://github.com/Rainyan/nt-hammer-bootstrap)
 [![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/Rainyan/nt-hammer-bootstrap?include_prereleases)](https://github.com/Rainyan/nt-hammer-bootstrap/releases/latest)
 [![License: GPLv3](https://img.shields.io/github/license/Rainyan/nt-hammer-bootstrap)](LICENSE)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)

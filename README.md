@@ -24,7 +24,7 @@ This tool automates the entire mapping tools setup described in [this Steam guid
 ## Contributing
 
 ### Bug reports
-If you have questions or run into problems, [bug reports](https://github.com/Rainyan/nt-hammer-bootstrap/issues) are welcome!
+If you have questions/feature requests, or run into problems, [bug reports](https://github.com/Rainyan/nt-hammer-bootstrap/issues) are welcome!
 
 ### For developers
 

@@ -104,8 +104,8 @@ def generate_hammer_config():
         data = data.replace("$MAPPING", mapping_path)
         data = data.replace("$SDKPATH", sdk_path)
         data = data.replace("$SDKCONTENTPATH", sdk_content_path)
-        with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
-            f_write.write(data)
+    with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
+        f_write.write(data)
 
     try:
         os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"))

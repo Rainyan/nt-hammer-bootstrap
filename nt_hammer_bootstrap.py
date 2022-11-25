@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
 
-"""An interactive GUI helper for setting up Source SDK and Hammer editor for NT mapping.
+"""An interactive GUI helper for setting up Source SDK and Hammer editor for NT mapping."""
 
+import os
+assert os.name == "nt", "This script supports Windows only."
+import sys
+
+from functools import partial
+import webbrowser
+import winreg
+
+import PySimpleGUI as sg
+from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
+
+
+COPYRIGHT = """
    Copyright (C) 2022 github.com/Rainyan
 
    This program is free software: you can redistribute it and/or modify
@@ -18,17 +31,6 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import os
-assert os.name == "nt", "This script supports Windows only."
-import sys
-
-import webbrowser
-import winreg
-
-import PySimpleGUI as sg
-from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
-
-
 # This needs to be in the install order.
 STEAM_APPIDS = {
     "Neotokyo": 244630,
@@ -37,7 +39,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 
 def resource_path():
@@ -84,6 +86,7 @@ def get_app_install_path(appid):
 def generate_hammer_config():
     """Generates the GameInfo.txt and GameConfig.txt configs for NT Hammer."""
     neotokyo_base_path = os.path.join(get_app_install_path(STEAM_APPIDS["Neotokyo"]), "NEOTOKYO")
+    stack = []
     if not os.path.isdir(neotokyo_base_path):
         oneshot_window("Abort", "Could not find NEOTOKYO Steam installation.")
         sys.exit(1)
@@ -91,9 +94,12 @@ def generate_hammer_config():
     try:
         os.mkdir(mapping_path)
     except FileExistsError:
-        oneshot_window("Continue", "Mapping path already exists! "
-                                   "Are you sure you want to continue?\n"
-                                   "If not, abort with the top-right X button.")
+        stack.append(partial(oneshot_window,
+                             "Continue",
+                             "Mapping path already exists! "
+                             "Are you sure you want to continue?\n"
+                             "If not, abort with the top-right X button."))
+        show_stack(stack)
 
     with open(os.path.join(resource_path(), "payload", "GameInfo.txt"),
               mode="r", encoding="utf-8") as f_read:
@@ -116,10 +122,12 @@ def generate_hammer_config():
     payload_gameconfig = os.path.join(resource_path(), "payload", "GameConfig.txt")
     gameconfig_path = os.path.join(sdk_path, "GameConfig.txt")
     if os.path.exists(gameconfig_path):
-        oneshot_window("Continue",
-                       f'GameConfig path already exists ({gameconfig_path}).'
-                       "\nAre you sure you want to continue? "
-                       "If not, abort with the top-right X button.")
+        stack.append(partial(oneshot_window,
+                             "Continue",
+                             f'GameConfig path already exists ({gameconfig_path}).'
+                             "\nAre you sure you want to continue? "
+                             "If not, abort with the top-right X button."))
+        show_stack(stack)
 
     with open(payload_gameconfig, mode="r", encoding="utf-8") as f_read:
         data = f_read.read()
@@ -139,77 +147,128 @@ def generate_hammer_config():
 def install_steamapp(app):
     """Initiates a Steam install of an app.
 
-       Input: App name which has a STEAM_APPIDS value defined."""
+       Input: App name which has a STEAM_APPIDS value defined.
+       Returns whether this window should get re-displayed after blocking."""
     print(f"Installing app {app}...")
     webbrowser.open(f"steam://install/{STEAM_APPIDS[app]}")
+    return False
 
 
 def launch_steamapp(app):
     """Launches a Steam app.
 
-       Input: App name which has a STEAM_APPIDS value defined."""
+       Input: App name which has a STEAM_APPIDS value defined.
+       Returns whether this window should get re-displayed after blocking."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
+    return False
 
 
 def oneshot_window(text_button="",
                    text_label="Please follow the instructions, and press the button when ready.",
                    title=f"Hammer install helper (v{VERSION})"):
-    """Create a blocking one-and-done GUI window."""
+    """Create a blocking one-and-done GUI window.
+
+       Returns whether this window should get re-displayed after blocking."""
     label = sg.Text(text_label)
     button = sg.Button(text_button)
-    layout = [[label], [button]]
+    layout = [
+        [sg.Menu( [["&Help", ["&About"]]] ),
+        [label], [button]] ]
     window = sg.Window(title, layout)
     event, _ = window.read()
     window.close()
     if event is None:
         sys.exit(0)
+    elif event == "About":
+        show_about()
+        return True
+    return False
+
+
+def show_about():
+    """Show copyright stuff."""
+    sg.popup("About this app", COPYRIGHT)
 
 
 def instruct_app_installation(app_name):
     """Specialized version of oneshot_window() for Steam app installation.
 
        Input: App name which has a STEAM_APPIDS value defined."""
-    oneshot_window("Ready to begin",
-                   f"Steam will now install {app_name}.\nIf it was already installed, "
-                   "nothing will happen, and you can continue as-is.\nOtherwise, please "
-                   "complete the Steam install procedure before continuing.")
+    stack = []
+    stack.append(partial(oneshot_window,
+                         "Ready to begin",
+                         f"Steam will now install {app_name}.\nIf it was already installed, "
+                         "nothing will happen, and you can continue as-is.\nOtherwise, please "
+                         "complete the Steam install procedure before continuing."))
+    show_stack(stack)
     install_steamapp(app_name)
-    oneshot_window(f"Press when {app_name} has been fully installed in Steam.",
-                   f"Now installing {app_name}. If it was already installed, "
-                   "nothing will happen, and you can continue as-is.")
-    oneshot_window(f"Press here to launch {app_name}",
-                   f"Please launch {app_name}, and then close it. "
-                   "This step generates some required files.")
+    stack.append(partial(oneshot_window,
+                         f"Press when {app_name} has been fully installed in Steam.",
+                         f"Now installing {app_name}. If it was already installed, "
+                         "nothing will happen, and you can continue as-is."))
+    stack.append(partial(oneshot_window,
+                         f"Press here to launch {app_name}",
+                         f"Please launch {app_name}, and then close it. "
+                         "This step generates some required files."))
+    show_stack(stack)
     launch_steamapp(app_name)
-    oneshot_window(f"Please close {app_name}, and then press this button when you're "
-                   "ready to continue.", f"{app_name} setup completed.")
+    stack.append(partial(oneshot_window,
+                         f"Please close {app_name}, and then press this button when you're "
+                         "ready to continue.", f"{app_name} setup completed."))
+    show_stack(stack)
 
 
-oneshot_window("Next",
-               "This is an interactive helper tool for setting up Hammer, "
-               "for mapping for Neotokyo.")
-oneshot_window("Next",
-               "Please read the instruction texts carefully before clicking next!\n"
-               "Some of them will require you to perform actions before continuing.")
-oneshot_window("Next",
-               "If you wish to cancel the installation at any time, press the X button "
-               "in the top-right corner of these popup windows.")
-oneshot_window("Ready to continue",
-               "Please open Steam and log in before continuing.")
+def show_stack(stack):
+    """Given a stack of GUI windows, pop and display them all in LIFO order."""
+    stack.reverse()
+    while True:
+        try:
+            gui_function = stack.pop()
+            while True:
+                if not gui_function():
+                    break
+        except IndexError:
+            break
+
+
+STACK = []
+STACK.append(partial(oneshot_window,
+                     "Next",
+                     "This is an interactive helper tool for setting up Hammer, "
+                     "for mapping for Neotokyo."))
+STACK.append(partial(oneshot_window,
+                     "Next",
+                     "Please read the instruction texts carefully before clicking next!\n"
+                     "Some of them will require you to perform actions before continuing."))
+STACK.append(partial(oneshot_window,
+                     "Next",
+                     "If you wish to cancel the installation at any time,\npress the X button "
+                     "in the top-right corner of these popup windows."))
+STACK.append(partial(oneshot_window,
+                     "Ready to continue",
+                     "Please open Steam and log in before continuing."))
+show_stack(STACK)
 
 for steamapp in STEAM_APPIDS:
     instruct_app_installation(steamapp)
 
-oneshot_window("Ready to continue",
-               "All Steam requirements are now installed.")
-oneshot_window("Ready to generate Hammer configs",
-               "Next, the tool will generate the required GameInfo/GameConfig configs.\n"
-               "Please back these up if you need to; we will overwrite them otherwise.")
+
+STACK.append(partial(oneshot_window,
+                     "Ready to continue",
+                     "All Steam requirements are now installed."))
+STACK.append(partial(oneshot_window,
+                     "Ready to generate Hammer configs",
+                     "Next, the tool will generate the required GameInfo/GameConfig configs.\n"
+                     "Please back these up if you need to; we will overwrite them otherwise."))
+show_stack(STACK)
 generate_hammer_config()
-oneshot_window("Finish",
-               "All done! To launch Hammer, please open Source SDK from Steam library's "
-               'Tools section.\nIn the "Engine version" section, select "Source SDK 2006".\n'
-               'In the "Current Game" section, select "NEOTOKYO".\n\n'
-               'If you ran into any bugs/issues when using this tool, please report them at:\n'
-               f'{TOOL_HOMEPAGE}')
+STACK.append(partial(oneshot_window,
+                     "Finish",
+                     "All done! To launch Hammer, please open Source SDK from Steam library's "
+                     'Tools section.\nIn the "Engine version" section, select "Source SDK 2006".\n'
+                     'In the "Current Game" section, select "NEOTOKYO".\n\n'
+                     'If you ran into any bugs/issues when using this tool, '
+                     'please report them at:\n'
+                     f'{TOOL_HOMEPAGE}'))
+show_stack(STACK)

@@ -54,6 +54,10 @@ pipenv run pip install --upgrade -r requirements.txt
 pipenv run python nt_hammer_bootstrap.py  # Run app
 ```
 
+#### Code conventions
+
+The Python code must pass latest version of `pylint`, using the default settings.
+
 #### Building the executable
 
 Please see the [.github/workflows](.github/workflows) files for code on building the .exe binary.

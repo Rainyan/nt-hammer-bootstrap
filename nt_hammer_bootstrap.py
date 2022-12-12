@@ -39,7 +39,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 
 
 def resource_path():
@@ -138,10 +138,7 @@ def generate_hammer_config():
     with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
         f_write.write(data)
 
-    try:
-        os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"))
-    except FileExistsError:
-        pass
+    os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"), exist_ok=True)
 
 
 def install_steamapp(app):

@@ -217,7 +217,7 @@ def instruct_app_installation(app_name):
 
 
 def show_stack(stack):
-    """Given a stack of GUI windows, pop and display them all in LIFO order."""
+    """Given a stack of GUI windows, pop and display them all in FIFO order."""
     stack.reverse()
     while True:
         try:

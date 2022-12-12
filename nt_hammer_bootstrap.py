@@ -39,7 +39,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 
 
 def resource_path():
@@ -138,30 +138,23 @@ def generate_hammer_config():
     with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
         f_write.write(data)
 
-    try:
-        os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"))
-    except FileExistsError:
-        pass
+    os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"), exist_ok=True)
 
 
 def install_steamapp(app):
     """Initiates a Steam install of an app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Installing app {app}...")
     webbrowser.open(f"steam://install/{STEAM_APPIDS[app]}")
-    return False
 
 
 def launch_steamapp(app):
     """Launches a Steam app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
-    return False
 
 
 def oneshot_window(text_button="",
@@ -220,7 +213,7 @@ def instruct_app_installation(app_name):
 
 
 def show_stack(stack):
-    """Given a stack of GUI windows, pop and display them all in LIFO order."""
+    """Given a stack of GUI windows, pop and display them all in FIFO order."""
     stack.reverse()
     while True:
         try:

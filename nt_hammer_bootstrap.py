@@ -144,21 +144,17 @@ def generate_hammer_config():
 def install_steamapp(app):
     """Initiates a Steam install of an app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Installing app {app}...")
     webbrowser.open(f"steam://install/{STEAM_APPIDS[app]}")
-    return False
 
 
 def launch_steamapp(app):
     """Launches a Steam app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
-    return False
 
 
 def oneshot_window(text_button="",

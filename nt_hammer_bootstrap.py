@@ -10,6 +10,7 @@ from functools import partial
 import webbrowser
 import winreg
 
+import pyperclip
 import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
@@ -31,6 +32,15 @@ COPYRIGHT = """
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+ACKNOWLEDGEMENTS = """
+    This project uses the following open-source software:
+
+    - valve-keyvalues-python (https://github.com/gorgitko/valve-keyvalues-python)
+    - PySimpleGUI (https://github.com/PySimpleGUI/PySimpleGUI)
+    - Pyperclip (https://github.com/asweigart/pyperclip)
+"""
+
+
 # This needs to be in the install order.
 STEAM_APPIDS = {
     "Neotokyo": 244630,
@@ -39,7 +49,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.4.0"
+VERSION = "0.5.0"
 
 
 def resource_path():
@@ -66,21 +76,7 @@ def get_steam_install_path():
         (steam_path, _) = winreg.QueryValueEx(handle, "InstallPath")
         winreg.CloseKey(handle)
         return os.path.normpath(steam_path)
-    assert False, "Could not find Steam install path."
-
-
-def get_app_install_path(appid):
-    """Return the path where a Steam AppID is installed, or "" if not found."""
-    libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
-    assert os.path.exists(libfolders)
-    kv = KeyValues(filename=libfolders)  # pylint: disable=invalid-name
-    for k in kv["libraryfolders"]:
-        if not str(appid) in kv["libraryfolders"][k]["apps"]:
-            continue
-        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"],
-                                             "steamapps",
-                                             "common"))
-    return ""
+    debug(False, "Could not find Steam install path")
 
 
 def generate_hammer_config():
@@ -164,6 +160,29 @@ def launch_steamapp(app):
     return False
 
 
+def error_window(error="Unknown error"):
+    """Create a blocking one-and-done critical error GUI window.
+
+       Execution will end with error code once this window closes.
+    """
+    title=f"Hammer install helper (v{VERSION})"
+    copy_button_text = "Copy error message to clipboard"
+    while True:
+        label = sg.Text(error)
+        button_copy = sg.Button(copy_button_text)
+        button_exit = sg.Button("Abort")
+        layout = [ [label], [button_copy], [button_exit] ]
+        window = sg.Window(title, layout)
+        event, _ = window.read()
+        window.close()
+        if event == copy_button_text:
+            pyperclip.copy(error)
+            copy_button_text = "✔️Copied to clipboard"
+        else:
+            break
+    sys.exit(1)
+
+
 def oneshot_window(text_button="",
                    text_label="Please follow the instructions, and press the button when ready.",
                    title=f"Hammer install helper (v{VERSION})"):
@@ -186,9 +205,41 @@ def oneshot_window(text_button="",
     return False
 
 
+def debug(*assertion):
+    """Debug helper for visualizing failed assertions.
+
+       First argument is asserted, and all arguments are dumped in the error
+       message."""
+    try:
+        assert assertion[0]
+        print("Assertion passed")
+    except AssertionError:
+        error_window(f"{assertion=}")
+
+
+def get_app_install_path(appid):
+    """Return the path where a Steam AppID is installed."""
+    libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
+    debug(os.path.exists(libfolders), f"os.path.exists(libfolders): {libfolders=}")
+    kv = KeyValues(filename=libfolders)  # pylint: disable=invalid-name
+    for k in kv["libraryfolders"]:
+        if not str(appid) in kv["libraryfolders"][k]["apps"]:
+            continue
+        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"],
+                                             "steamapps",
+                                             "common"))
+    debug(False, f"Could not find app install path ({appid=})")
+
+
 def show_about():
     """Show copyright stuff."""
-    sg.popup("About this app", COPYRIGHT)
+    sg.popup(
+        "About this app",
+        ("COPYRIGHT:\n\n" +
+         COPYRIGHT +
+         "\n\n- - - - - - - - - -\n\nACKNOWLEDGEMENTS:\n" +
+         ACKNOWLEDGEMENTS)
+    )
 
 
 def instruct_app_installation(app_name):
@@ -249,6 +300,7 @@ STACK.append(partial(oneshot_window,
                      "Ready to continue",
                      "Please open Steam and log in before continuing."))
 show_stack(STACK)
+
 
 for steamapp in STEAM_APPIDS:
     instruct_app_installation(steamapp)

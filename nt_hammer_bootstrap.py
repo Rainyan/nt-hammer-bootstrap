@@ -88,6 +88,7 @@ def generate_hammer_config():
         sys.exit(1)
     mapping_path = os.path.join(neotokyo_base_path, "mapping")
     try:
+        print(f"{mapping_path=}")
         os.mkdir(mapping_path)
     except FileExistsError:
         stack.append(partial(oneshot_window,
@@ -96,6 +97,9 @@ def generate_hammer_config():
                              "Are you sure you want to continue?\n"
                              "If not, abort with the top-right X button."))
         show_stack(stack)
+
+    print(f'gameinfo readpath: {os.path.join(resource_path(), "payload", "GameInfo.txt")}')
+    print(f'gameinfo writepath: {os.path.join(mapping_path, "GameInfo.txt")}')
 
     with open(os.path.join(resource_path(), "payload", "GameInfo.txt"),
               mode="r", encoding="utf-8") as f_read:

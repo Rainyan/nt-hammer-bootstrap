@@ -49,7 +49,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.5.0"
+VERSION = "0.5.x (DEBUG)"
 
 
 def resource_path():
@@ -57,6 +57,7 @@ def resource_path():
     try:
         base_path = sys._MEIPASS  # pylint: disable=protected-access
     except AttributeError:
+        debug(False, "PyInstaller did not set sys._MEIPASS!")
         base_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.normpath(base_path)
 
@@ -98,11 +99,16 @@ def generate_hammer_config():
                              "If not, abort with the top-right X button."))
         show_stack(stack)
 
+    respath = resource_path()
+    debug(os.path.isdir(respath), f"Respath is not a valid directory")
+
+    gameinfo_readpath = os.path.join(resource_path(), "payload", "GameInfo.txt")
+    debug(os.path.isfile(gameinfo_readpath, "GameInfo readpath file must exist")
+
     print(f'gameinfo readpath: {os.path.join(resource_path(), "payload", "GameInfo.txt")}')
     print(f'gameinfo writepath: {os.path.join(mapping_path, "GameInfo.txt")}')
 
-    with open(os.path.join(resource_path(), "payload", "GameInfo.txt"),
-              mode="r", encoding="utf-8") as f_read:
+    with open(gameinfo_readpath, mode="r", encoding="utf-8") as f_read:
         with open(os.path.join(mapping_path, "GameInfo.txt"),
                   mode="w", encoding="utf-8") as f_write:
             f_write.write(f_read.read())
@@ -111,7 +117,9 @@ def generate_hammer_config():
     sdk_path = os.path.join(source_sdk_base_path, "SourceSDK", "bin", "ep1", "bin")
     sdk_content_path = os.path.join(source_sdk_base_path, "sourcesdk_content")
 
-    if not os.path.isdir(neotokyo_base_path):
+    if (not os.path.isdir(source_sdk_base_path) or
+            not os.path.isdir(sdk_path) or
+            not os.path.isdir(sdk_content_path)):
         oneshot_window("Abort", "Could not find Source SDK installation.\n"
                                 "Make sure you have both Source SDK and "
                                 "Source SDK Base 2006 installed,\nand launch "
@@ -120,6 +128,8 @@ def generate_hammer_config():
         sys.exit(1)
 
     payload_gameconfig = os.path.join(resource_path(), "payload", "GameConfig.txt")
+    debug(os.path.isfile(payload_gameconfig), "Failed to read payload GameConfig")
+
     gameconfig_path = os.path.join(sdk_path, "GameConfig.txt")
     if os.path.exists(gameconfig_path):
         stack.append(partial(oneshot_window,
@@ -135,13 +145,13 @@ def generate_hammer_config():
         data = data.replace("$MAPPING", mapping_path)
         data = data.replace("$SDKPATH", sdk_path)
         data = data.replace("$SDKCONTENTPATH", sdk_content_path)
-    with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
-        f_write.write(data)
+        with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
+            f_write.write(data)
 
-    try:
-        os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"))
-    except FileExistsError:
-        pass
+    os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"),
+                exist_ok=True)
+    debug(os.isdir(os.path.join(sdk_content_path, "neotokyo", "mapsrc")),
+          "Failed to recursively build neotokyo mapsrc")
 
 
 def install_steamapp(app):

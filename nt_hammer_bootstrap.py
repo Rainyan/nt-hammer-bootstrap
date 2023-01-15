@@ -100,10 +100,10 @@ def generate_hammer_config():
         show_stack(stack)
 
     respath = resource_path()
-    debug(os.path.isdir(respath), f"Respath is not a valid directory")
+    debug(os.path.isdir(respath), "Respath is not a valid directory")
 
     gameinfo_readpath = os.path.join(resource_path(), "payload", "GameInfo.txt")
-    debug(os.path.isfile(gameinfo_readpath, "GameInfo readpath file must exist")
+    debug(os.path.isfile(gameinfo_readpath), "GameInfo readpath file must exist")
 
     print(f'gameinfo readpath: {os.path.join(resource_path(), "payload", "GameInfo.txt")}')
     print(f'gameinfo writepath: {os.path.join(mapping_path, "GameInfo.txt")}')
@@ -150,7 +150,7 @@ def generate_hammer_config():
 
     os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"),
                 exist_ok=True)
-    debug(os.isdir(os.path.join(sdk_content_path, "neotokyo", "mapsrc")),
+    debug(os.path.isdir(os.path.join(sdk_content_path, "neotokyo", "mapsrc")),
           "Failed to recursively build neotokyo mapsrc")
 
 

@@ -80,6 +80,19 @@ def get_steam_install_path():
     debug(False, "Could not find Steam install path")
 
 
+def is_wine():
+    """Returns whether we're running inside Wine."""
+    res = False
+    registry = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
+    try:
+        handle = winreg.OpenKey(registry, "SOFTWARE\\Wine")
+        res = True
+    except FileNotFoundError:
+        pass
+    winreg.CloseKey(handle)
+    return ret
+
+
 def generate_hammer_config():
     """Generates the GameInfo.txt and GameConfig.txt configs for NT Hammer."""
     neotokyo_base_path = os.path.join(get_app_install_path(STEAM_APPIDS["Neotokyo"]), "NEOTOKYO")
@@ -313,6 +326,14 @@ STACK.append(partial(oneshot_window,
 STACK.append(partial(oneshot_window,
                      "Ready to continue",
                      "Please open Steam and log in before continuing."))
+if is_wine():
+    STACK.append(partial(oneshot_window,
+                         "Ok",
+                         "It looks like you're using Wine.\nThis should work, but you'll "
+                         "need to make sure Steam is installed in the same prefix where "
+                         "you're running this tool in;\nspecifically this tool will need "
+                         "to find the Steam installation specific\nWindows register values "
+                         "to correctly locate Steam app installation paths."))
 show_stack(STACK)
 
 

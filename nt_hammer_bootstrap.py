@@ -90,7 +90,7 @@ def is_wine():
     except FileNotFoundError:
         pass
     winreg.CloseKey(handle)
-    return ret
+    return res
 
 
 def generate_hammer_config():

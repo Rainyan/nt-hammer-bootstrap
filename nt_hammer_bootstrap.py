@@ -49,6 +49,7 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
+
 VERSION = "0.5.x (DEBUG)"
 
 
@@ -157,21 +158,17 @@ def generate_hammer_config():
 def install_steamapp(app):
     """Initiates a Steam install of an app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Installing app {app}...")
     webbrowser.open(f"steam://install/{STEAM_APPIDS[app]}")
-    return False
 
 
 def launch_steamapp(app):
     """Launches a Steam app.
 
-       Input: App name which has a STEAM_APPIDS value defined.
-       Returns whether this window should get re-displayed after blocking."""
+       Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
-    return False
 
 
 def error_window(error="Unknown error"):
@@ -285,7 +282,7 @@ def instruct_app_installation(app_name):
 
 
 def show_stack(stack):
-    """Given a stack of GUI windows, pop and display them all in LIFO order."""
+    """Given a stack of GUI windows, pop and display them all in FIFO order."""
     stack.reverse()
     while True:
         try:

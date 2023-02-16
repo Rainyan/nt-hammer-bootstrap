@@ -66,4 +66,5 @@ Please see the [.github/workflows](.github/workflows) files for code on building
 
 This project uses the following open-source software:
 * [valve-keyvalues-python](https://github.com/gorgitko/valve-keyvalues-python)
+* [Pyperclip](https://github.com/asweigart/pyperclip)
 * [PySimpleGUI](https://github.com/PySimpleGUI/PySimpleGUI)

@@ -10,6 +10,7 @@ from functools import partial
 import webbrowser
 import winreg
 
+import pyperclip
 import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
@@ -31,6 +32,15 @@ COPYRIGHT = """
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+ACKNOWLEDGEMENTS = """
+    This project uses the following open-source software:
+
+    - valve-keyvalues-python (https://github.com/gorgitko/valve-keyvalues-python)
+    - PySimpleGUI (https://github.com/PySimpleGUI/PySimpleGUI)
+    - Pyperclip (https://github.com/asweigart/pyperclip)
+"""
+
+
 # This needs to be in the install order.
 STEAM_APPIDS = {
     "Neotokyo": 244630,
@@ -39,7 +49,8 @@ STEAM_APPIDS = {
 }
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
-VERSION = "0.4.1"
+
+VERSION = "0.5.x (DEBUG)"
 
 
 def resource_path():
@@ -47,6 +58,7 @@ def resource_path():
     try:
         base_path = sys._MEIPASS  # pylint: disable=protected-access
     except AttributeError:
+        debug(False, "PyInstaller did not set sys._MEIPASS!")
         base_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.normpath(base_path)
 
@@ -66,21 +78,7 @@ def get_steam_install_path():
         (steam_path, _) = winreg.QueryValueEx(handle, "InstallPath")
         winreg.CloseKey(handle)
         return os.path.normpath(steam_path)
-    assert False, "Could not find Steam install path."
-
-
-def get_app_install_path(appid):
-    """Return the path where a Steam AppID is installed, or "" if not found."""
-    libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
-    assert os.path.exists(libfolders)
-    kv = KeyValues(filename=libfolders)  # pylint: disable=invalid-name
-    for k in kv["libraryfolders"]:
-        if not str(appid) in kv["libraryfolders"][k]["apps"]:
-            continue
-        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"],
-                                             "steamapps",
-                                             "common"))
-    return ""
+    debug(False, "Could not find Steam install path")
 
 
 def generate_hammer_config():
@@ -92,6 +90,7 @@ def generate_hammer_config():
         sys.exit(1)
     mapping_path = os.path.join(neotokyo_base_path, "mapping")
     try:
+        print(f"{mapping_path=}")
         os.mkdir(mapping_path)
     except FileExistsError:
         stack.append(partial(oneshot_window,
@@ -101,8 +100,16 @@ def generate_hammer_config():
                              "If not, abort with the top-right X button."))
         show_stack(stack)
 
-    with open(os.path.join(resource_path(), "payload", "GameInfo.txt"),
-              mode="r", encoding="utf-8") as f_read:
+    respath = resource_path()
+    debug(os.path.isdir(respath), "Respath is not a valid directory")
+
+    gameinfo_readpath = os.path.join(resource_path(), "payload", "GameInfo.txt")
+    debug(os.path.isfile(gameinfo_readpath), "GameInfo readpath file must exist")
+
+    print(f'gameinfo readpath: {os.path.join(resource_path(), "payload", "GameInfo.txt")}')
+    print(f'gameinfo writepath: {os.path.join(mapping_path, "GameInfo.txt")}')
+
+    with open(gameinfo_readpath, mode="r", encoding="utf-8") as f_read:
         with open(os.path.join(mapping_path, "GameInfo.txt"),
                   mode="w", encoding="utf-8") as f_write:
             f_write.write(f_read.read())
@@ -111,7 +118,9 @@ def generate_hammer_config():
     sdk_path = os.path.join(source_sdk_base_path, "SourceSDK", "bin", "ep1", "bin")
     sdk_content_path = os.path.join(source_sdk_base_path, "sourcesdk_content")
 
-    if not os.path.isdir(neotokyo_base_path):
+    if (not os.path.isdir(source_sdk_base_path) or
+            not os.path.isdir(sdk_path) or
+            not os.path.isdir(sdk_content_path)):
         oneshot_window("Abort", "Could not find Source SDK installation.\n"
                                 "Make sure you have both Source SDK and "
                                 "Source SDK Base 2006 installed,\nand launch "
@@ -120,6 +129,8 @@ def generate_hammer_config():
         sys.exit(1)
 
     payload_gameconfig = os.path.join(resource_path(), "payload", "GameConfig.txt")
+    debug(os.path.isfile(payload_gameconfig), "Failed to read payload GameConfig")
+
     gameconfig_path = os.path.join(sdk_path, "GameConfig.txt")
     if os.path.exists(gameconfig_path):
         stack.append(partial(oneshot_window,
@@ -135,10 +146,13 @@ def generate_hammer_config():
         data = data.replace("$MAPPING", mapping_path)
         data = data.replace("$SDKPATH", sdk_path)
         data = data.replace("$SDKCONTENTPATH", sdk_content_path)
-    with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
-        f_write.write(data)
+        with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
+            f_write.write(data)
 
-    os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"), exist_ok=True)
+    os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"),
+                exist_ok=True)
+    debug(os.path.isdir(os.path.join(sdk_content_path, "neotokyo", "mapsrc")),
+          "Failed to recursively build neotokyo mapsrc")
 
 
 def install_steamapp(app):
@@ -155,6 +169,29 @@ def launch_steamapp(app):
        Input: App name which has a STEAM_APPIDS value defined."""
     print(f"Launching app {app}...")
     webbrowser.open(f"steam://run/{STEAM_APPIDS[app]}")
+
+
+def error_window(error="Unknown error"):
+    """Create a blocking one-and-done critical error GUI window.
+
+       Execution will end with error code once this window closes.
+    """
+    title=f"Hammer install helper (v{VERSION})"
+    copy_button_text = "Copy error message to clipboard"
+    while True:
+        label = sg.Text(error)
+        button_copy = sg.Button(copy_button_text)
+        button_exit = sg.Button("Abort")
+        layout = [ [label], [button_copy], [button_exit] ]
+        window = sg.Window(title, layout)
+        event, _ = window.read()
+        window.close()
+        if event == copy_button_text:
+            pyperclip.copy(error)
+            copy_button_text = "✔️Copied to clipboard"
+        else:
+            break
+    sys.exit(1)
 
 
 def oneshot_window(text_button="",
@@ -179,9 +216,41 @@ def oneshot_window(text_button="",
     return False
 
 
+def debug(*assertion):
+    """Debug helper for visualizing failed assertions.
+
+       First argument is asserted, and all arguments are dumped in the error
+       message."""
+    try:
+        assert assertion[0]
+        print("Assertion passed")
+    except AssertionError:
+        error_window(f"{assertion=}")
+
+
+def get_app_install_path(appid):
+    """Return the path where a Steam AppID is installed."""
+    libfolders = os.path.join(get_steam_install_path(), "config", "libraryfolders.vdf")
+    debug(os.path.exists(libfolders), f"os.path.exists(libfolders): {libfolders=}")
+    kv = KeyValues(filename=libfolders)  # pylint: disable=invalid-name
+    for k in kv["libraryfolders"]:
+        if not str(appid) in kv["libraryfolders"][k]["apps"]:
+            continue
+        return os.path.normpath(os.path.join(kv["libraryfolders"][k]["path"],
+                                             "steamapps",
+                                             "common"))
+    debug(False, f"Could not find app install path ({appid=})")
+
+
 def show_about():
     """Show copyright stuff."""
-    sg.popup("About this app", COPYRIGHT)
+    sg.popup(
+        "About this app",
+        ("COPYRIGHT:\n\n" +
+         COPYRIGHT +
+         "\n\n- - - - - - - - - -\n\nACKNOWLEDGEMENTS:\n" +
+         ACKNOWLEDGEMENTS)
+    )
 
 
 def instruct_app_installation(app_name):
@@ -242,6 +311,7 @@ STACK.append(partial(oneshot_window,
                      "Ready to continue",
                      "Please open Steam and log in before continuing."))
 show_stack(STACK)
+
 
 for steamapp in STEAM_APPIDS:
     instruct_app_installation(steamapp)

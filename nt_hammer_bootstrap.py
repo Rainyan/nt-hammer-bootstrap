@@ -237,7 +237,7 @@ def generate_hammer_config():
         )
         show_stack(stack)
 
-    global PAYLOAD_GAMECONFIG
+    global PAYLOAD_GAMECONFIG  # pylint: disable=global-statement
     PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$NTBASE", neotokyo_base_path)
     PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$MAPPING", mapping_path)
     PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$SDKPATH", sdk_path)

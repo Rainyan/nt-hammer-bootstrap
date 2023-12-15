@@ -238,10 +238,10 @@ def generate_hammer_config():
         show_stack(stack)
 
     global PAYLOAD_GAMECONFIG
-    PAYLOAD_GAMECONFIG = data.replace("$NTBASE", neotokyo_base_path)
-    PAYLOAD_GAMECONFIG = data.replace("$MAPPING", mapping_path)
-    PAYLOAD_GAMECONFIG = data.replace("$SDKPATH", sdk_path)
-    PAYLOAD_GAMECONFIG = data.replace("$SDKCONTENTPATH", sdk_content_path)
+    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$NTBASE", neotokyo_base_path)
+    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$MAPPING", mapping_path)
+    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$SDKPATH", sdk_path)
+    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$SDKCONTENTPATH", sdk_content_path)
     with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
         f_write.write(PAYLOAD_GAMECONFIG)
 

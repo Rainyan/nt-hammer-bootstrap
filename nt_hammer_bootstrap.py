@@ -197,7 +197,6 @@ def generate_hammer_config():
     respath = resource_path()
     debug(os.path.isdir(respath), "Respath is not a valid directory")
 
-    global PAYLOAD_GAMEINFO
     print(f'gameinfo writepath: {os.path.join(mapping_path, "GameInfo.txt")}')
     with open(
         os.path.join(mapping_path, "GameInfo.txt"), mode="w", encoding="utf-8"

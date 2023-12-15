@@ -32,7 +32,7 @@ jobs:
 
       - name: Build target
         working-directory: ${{ github.workspace }}
-        run: pyinstaller --onefile --version-file version.rc --add-data "payload/GameConfig.txt;payload" --add-data "payload/GameInfo.txt;payload" --paths valve_keyvalues_python nt_hammer_bootstrap.py
+        run: pyinstaller --onefile --version-file version.rc --paths valve_keyvalues_python nt_hammer_bootstrap.py
 
       - name: Copy other requirements
         working-directory: ${{ github.workspace }}

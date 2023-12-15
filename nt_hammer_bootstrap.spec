@@ -8,7 +8,7 @@ a = Analysis(
     ['nt_hammer_bootstrap.py'],
     pathex=['valve_keyvalues_python'],
     binaries=[],
-    datas=[('payload\\GameConfig.txt', 'payload'), ('payload\\GameInfo.txt', 'payload')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

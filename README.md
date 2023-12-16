@@ -49,7 +49,7 @@ Please see the [LICENSE](LICENSE) file for details. This project and its derivat
 git clone --recurse-submodules https://github.com/Rainyan/nt-hammer-bootstrap
 cd "./nt-hammer-bootstrap"
 pip install --upgrade pipenv  # For virtualizing the dev environment
-pipenv --three
+pipenv install
 pipenv run pip install --upgrade -r requirements.txt
 pipenv run python nt_hammer_bootstrap.py  # Run app
 ```

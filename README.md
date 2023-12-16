@@ -60,7 +60,7 @@ The Python code must pass latest version of `pylint`, using the default settings
 
 #### Building the executable
 
-Please see the [.github/workflows](.github/workflows) files for code on building the .exe binary.
+Please see the [build script](.github/workflows/build.yml) for an example of building the .exe binary.
 
 ### Acknowledgements
 

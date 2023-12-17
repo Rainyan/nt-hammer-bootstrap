@@ -16,29 +16,29 @@ import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
 
-COPYRIGHT = """
-   Copyright (C) 2022 github.com/Rainyan
+COPYRIGHT = r"""
+Copyright (C) 2022- github.com/Rainyan
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-ACKNOWLEDGEMENTS = """
-    This project uses the following open-source software:
+ACKNOWLEDGEMENTS = r"""
+This project uses the following open-source software:
+  * valve-keyvalues-python
+    https://github.com/gorgitko/valve-keyvalues-python
+    MIT license
 
-    - valve-keyvalues-python (https://github.com/gorgitko/valve-keyvalues-python)
-    - PySimpleGUI (https://github.com/PySimpleGUI/PySimpleGUI)
-    - Pyperclip (https://github.com/asweigart/pyperclip)
+  * PySimpleGUI
+    https://github.com/PySimpleGUI/PySimpleGUI
+    LGPL-3.0 license
+
+  * Pyperclip
+    https://github.com/asweigart/pyperclip
+    BSD-3-Clause license
 """
 
 
@@ -343,12 +343,7 @@ def show_about():
     """Show copyright stuff."""
     sg.popup(
         "About this app",
-        (
-            "COPYRIGHT:\n\n"
-            + COPYRIGHT
-            + "\n\n- - - - - - - - - -\n\nACKNOWLEDGEMENTS:\n"
-            + ACKNOWLEDGEMENTS
-        ),
+        (f"{COPYRIGHT}\nACKNOWLEDGEMENTS\n{ACKNOWLEDGEMENTS}"),
     )
 
 

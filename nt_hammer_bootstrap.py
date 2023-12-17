@@ -51,7 +51,7 @@ STEAM_APPIDS = {
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
 
-VERSION = "0.5.6"
+VERSION = "0.5.7"
 
 FILE_GAMEINFO = r""""GameInfo"
 {

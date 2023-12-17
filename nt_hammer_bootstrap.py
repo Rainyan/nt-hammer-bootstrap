@@ -16,29 +16,29 @@ import PySimpleGUI as sg
 from valve_keyvalues_python.valve_keyvalues_python.keyvalues import KeyValues
 
 
-COPYRIGHT = """
-   Copyright (C) 2022 github.com/Rainyan
+COPYRIGHT = r"""
+Copyright (C) 2022- github.com/Rainyan
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-ACKNOWLEDGEMENTS = """
-    This project uses the following open-source software:
+ACKNOWLEDGEMENTS = r"""
+This project uses the following open-source software:
+  * valve-keyvalues-python
+    https://github.com/gorgitko/valve-keyvalues-python
+    MIT license
 
-    - valve-keyvalues-python (https://github.com/gorgitko/valve-keyvalues-python)
-    - PySimpleGUI (https://github.com/PySimpleGUI/PySimpleGUI)
-    - Pyperclip (https://github.com/asweigart/pyperclip)
+  * PySimpleGUI
+    https://github.com/PySimpleGUI/PySimpleGUI
+    LGPL-3.0 license
+
+  * Pyperclip
+    https://github.com/asweigart/pyperclip
+    BSD-3-Clause license
 """
 
 
@@ -51,9 +51,9 @@ STEAM_APPIDS = {
 
 TOOL_HOMEPAGE = "https://github.com/Rainyan/nt-hammer-bootstrap"
 
-VERSION = "0.5.6"
+VERSION = "0.5.7"
 
-PAYLOAD_GAMEINFO = r""""GameInfo"
+FILE_GAMEINFO = r""""GameInfo"
 {
 game "NEOTOKYO°"
 title "neatbkyoc"
@@ -108,7 +108,7 @@ Game hl2
 }
 }"""
 
-PAYLOAD_GAMECONFIG = r""""Configs"
+FILE_GAMECONFIG = r""""Configs"
 {
 	"Games"
 	{
@@ -201,7 +201,7 @@ def generate_hammer_config():
     with open(
         os.path.join(mapping_path, "GameInfo.txt"), mode="w", encoding="utf-8"
     ) as f_write:
-        f_write.write(PAYLOAD_GAMEINFO)
+        f_write.write(FILE_GAMEINFO)
 
     source_sdk_base_path = os.path.join(
         get_app_install_path(STEAM_APPIDS["Source SDK"])
@@ -237,13 +237,13 @@ def generate_hammer_config():
         )
         show_stack(stack)
 
-    global PAYLOAD_GAMECONFIG  # pylint: disable=global-statement
-    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$NTBASE", neotokyo_base_path)
-    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$MAPPING", mapping_path)
-    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$SDKPATH", sdk_path)
-    PAYLOAD_GAMECONFIG = PAYLOAD_GAMECONFIG.replace("$SDKCONTENTPATH", sdk_content_path)
+    global FILE_GAMECONFIG  # pylint: disable=global-statement
+    FILE_GAMECONFIG = FILE_GAMECONFIG.replace("$NTBASE", neotokyo_base_path)
+    FILE_GAMECONFIG = FILE_GAMECONFIG.replace("$MAPPING", mapping_path)
+    FILE_GAMECONFIG = FILE_GAMECONFIG.replace("$SDKPATH", sdk_path)
+    FILE_GAMECONFIG = FILE_GAMECONFIG.replace("$SDKCONTENTPATH", sdk_content_path)
     with open(gameconfig_path, mode="w", encoding="utf-8") as f_write:
-        f_write.write(PAYLOAD_GAMECONFIG)
+        f_write.write(FILE_GAMECONFIG)
 
     os.makedirs(os.path.join(sdk_content_path, "neotokyo", "mapsrc"), exist_ok=True)
     debug(
@@ -343,12 +343,7 @@ def show_about():
     """Show copyright stuff."""
     sg.popup(
         "About this app",
-        (
-            "COPYRIGHT:\n\n"
-            + COPYRIGHT
-            + "\n\n- - - - - - - - - -\n\nACKNOWLEDGEMENTS:\n"
-            + ACKNOWLEDGEMENTS
-        ),
+        (f"{COPYRIGHT}\nACKNOWLEDGEMENTS\n{ACKNOWLEDGEMENTS}"),
     )
 
 

@@ -37,10 +37,6 @@ If you have questions/feature requests, or run into problems, [bug reports](http
 
 ### For developers
 
-#### Project licensing
-
-Please see the [LICENSE](LICENSE) file for details. This project and its derivatives must use GPL, because our GUI library dependency is GPL.
-
 #### Setting up the environment
 
 ```bash
